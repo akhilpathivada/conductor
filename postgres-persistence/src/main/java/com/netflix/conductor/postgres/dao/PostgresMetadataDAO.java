@@ -26,6 +26,7 @@ import org.springframework.retry.support.RetryTemplate;
 import com.netflix.conductor.common.metadata.events.EventHandler;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import com.netflix.conductor.common.metadata.workflow.WorkflowDefSummary;
 import com.netflix.conductor.core.exception.ConflictException;
 import com.netflix.conductor.core.exception.NotFoundException;
 import com.netflix.conductor.dao.EventHandlerDAO;
@@ -220,6 +221,43 @@ public class PostgresMetadataDAO extends PostgresBaseDAO implements MetadataDAO,
         return queryWithTransaction(
                 GET_ALL_WORKFLOW_DEF_LATEST_VERSIONS_QUERY,
                 q -> q.executeAndFetch(WorkflowDef.class));
+    }
+
+    /**
+     * Lightweight query that returns only name, version, and timestamps without deserializing the
+     * full workflow definition JSON. This avoids the CPU and memory cost of parsing large json_data
+     * blobs when only summary metadata is needed.
+     */
+    @Override
+    public List<WorkflowDefSummary> getWorkflowNamesAndVersions() {
+        final String QUERY =
+                "SELECT name, version, created_on, modified_on "
+                        + "FROM meta_workflow_def ORDER BY name, version";
+
+        return queryWithTransaction(
+                QUERY,
+                q ->
+                        q.executeAndFetch(
+                                rs -> {
+                                    List<WorkflowDefSummary> summaries = new ArrayList<>();
+                                    while (rs.next()) {
+                                        WorkflowDefSummary s = new WorkflowDefSummary();
+                                        s.setName(rs.getString("name"));
+                                        s.setVersion(rs.getInt("version"));
+                                        java.sql.Timestamp createdOn =
+                                                rs.getTimestamp("created_on");
+                                        if (createdOn != null) {
+                                            s.setCreateTime(createdOn.getTime());
+                                        }
+                                        java.sql.Timestamp modifiedOn =
+                                                rs.getTimestamp("modified_on");
+                                        if (modifiedOn != null) {
+                                            s.setUpdateTime(modifiedOn.getTime());
+                                        }
+                                        summaries.add(s);
+                                    }
+                                    return summaries;
+                                }));
     }
 
     public List<WorkflowDef> getAllLatest() {

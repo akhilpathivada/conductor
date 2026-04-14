@@ -226,28 +226,12 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     public Map<String, ? extends Iterable<WorkflowDefSummary>> getWorkflowNamesAndVersions() {
-        List<WorkflowDef> workflowDefs = metadataDAO.getAllWorkflowDefs();
+        List<WorkflowDefSummary> summaries = metadataDAO.getWorkflowNamesAndVersions();
 
         Map<String, TreeSet<WorkflowDefSummary>> retval = new HashMap<>();
-        for (WorkflowDef def : workflowDefs) {
-            String workflowName = def.getName();
-            WorkflowDefSummary summary = fromWorkflowDef(def);
-
-            retval.putIfAbsent(workflowName, new TreeSet<WorkflowDefSummary>());
-
-            TreeSet<WorkflowDefSummary> versions = retval.get(workflowName);
-            versions.add(summary);
+        for (WorkflowDefSummary summary : summaries) {
+            retval.computeIfAbsent(summary.getName(), k -> new TreeSet<>()).add(summary);
         }
-
         return retval;
-    }
-
-    private WorkflowDefSummary fromWorkflowDef(WorkflowDef def) {
-        WorkflowDefSummary summary = new WorkflowDefSummary();
-        summary.setName(def.getName());
-        summary.setVersion(def.getVersion());
-        summary.setCreateTime(def.getCreateTime());
-
-        return summary;
     }
 }
