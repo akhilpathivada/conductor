@@ -13,6 +13,7 @@
 package com.netflix.conductor.rest.controllers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -158,5 +159,13 @@ public class MetadataResourceTest {
     public void testUnregisterTaskDef() {
         metadataResource.unregisterTaskDef("test");
         verify(mockMetadataService, times(1)).unregisterTaskDef(anyString());
+    }
+
+    @Test
+    public void testGetWorkflowNames() {
+        List<String> names = Arrays.asList("workflow_a", "workflow_b");
+        when(mockMetadataService.getWorkflowNames()).thenReturn(names);
+        assertEquals(names, metadataResource.getWorkflowNames());
+        verify(mockMetadataService, times(1)).getWorkflowNames();
     }
 }

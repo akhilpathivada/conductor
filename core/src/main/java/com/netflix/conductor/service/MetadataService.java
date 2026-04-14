@@ -156,4 +156,9 @@ public interface MetadataService {
             boolean activeOnly);
 
     List<WorkflowDef> getWorkflowDefsLatestVersions();
+
+    /**
+     * @return Returns distinct workflow definition names (no versions, no definition bodies)
+     */
+    List<String> getWorkflowNames();
 }
