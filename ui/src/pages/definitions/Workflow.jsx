@@ -73,14 +73,25 @@ export default function WorkflowDefinitions() {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(15);
 
-  const pagination = { start: (page - 1) * rowsPerPage, size: rowsPerPage };
-
-  const { data, isFetching } = useLatestWorkflowDefs(pagination);
-
   const [filterParam, setFilterParam] = useQueryState("filter", "");
   const filterObj = filterParam === "" ? undefined : JSON.parse(filterParam);
 
+  const serverFilter = useMemo(() => {
+    if (filterObj && filterObj.columnName && filterObj.substring) {
+      return {
+        filterField: filterObj.columnName,
+        filterValue: filterObj.substring,
+      };
+    }
+    return null;
+  }, [filterObj]);
+
+  const pagination = { start: (page - 1) * rowsPerPage, size: rowsPerPage };
+
+  const { data, isFetching } = useLatestWorkflowDefs(pagination, serverFilter);
+
   const handleFilterChange = (obj) => {
+    setPage(1);
     if (obj) {
       setFilterParam(JSON.stringify(obj));
     } else {
