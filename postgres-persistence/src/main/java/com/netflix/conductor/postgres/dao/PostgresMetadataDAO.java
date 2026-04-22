@@ -273,7 +273,7 @@ public class PostgresMetadataDAO extends PostgresBaseDAO
         if ("name".equals(filterField)) {
             filterClause = "AND name ILIKE ?";
         } else {
-            filterClause = "AND json_data->>'" + filterField + "' ILIKE ?";
+            filterClause = "AND json_data::jsonb->>'" + filterField + "' ILIKE ?";
         }
 
         final String countQuery =
