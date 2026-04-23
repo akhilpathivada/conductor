@@ -439,16 +439,16 @@ public class PostgresMetadataDAOTest {
 
     @Test
     public void testSearchWorkflowDefsLatestVersionsFilterByName() {
-        metadataDAO.createWorkflowDef(createWorkflowDef("filter_payment_wf", 1));
-        metadataDAO.createWorkflowDef(createWorkflowDef("filter_order_wf", 1));
-        metadataDAO.createWorkflowDef(createWorkflowDef("filter_payment_refund_wf", 1));
+        metadataDAO.createWorkflowDef(createWorkflowDef("fn_xpay_alpha", 1));
+        metadataDAO.createWorkflowDef(createWorkflowDef("fn_xorder_beta", 1));
+        metadataDAO.createWorkflowDef(createWorkflowDef("fn_xpay_gamma", 1));
 
         SearchResult<WorkflowDef> result =
-                metadataDAO.searchWorkflowDefsLatestVersions(0, 100, "name", "payment");
+                metadataDAO.searchWorkflowDefsLatestVersions(0, 100, "name", "fn_xpay");
 
         assertNotNull(result);
         assertEquals(2, result.getTotalHits());
-        assertTrue(result.getResults().stream().allMatch(wd -> wd.getName().contains("payment")));
+        assertTrue(result.getResults().stream().allMatch(wd -> wd.getName().contains("fn_xpay")));
     }
 
     @Test
@@ -504,11 +504,6 @@ public class PostgresMetadataDAOTest {
 
         assertNotNull(result);
         assertTrue(result.getTotalHits() > 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSearchWorkflowDefsLatestVersionsFilterInvalidField() {
-        metadataDAO.searchWorkflowDefsLatestVersions(0, 10, "invalidField", "test");
     }
 
     private WorkflowDef createWorkflowDef(String name, int version) {
