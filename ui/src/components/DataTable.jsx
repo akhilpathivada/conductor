@@ -173,7 +173,7 @@ export default function DataTable(props) {
       sortServer={paginationServer}
       actions={
         <>
-          {showFilter && (
+          {showFilter && (!paginationServer || onFilterChange) && (
             <Filter
               columns={columns}
               filterObj={filterObj}

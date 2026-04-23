@@ -90,14 +90,18 @@ export default function WorkflowDefinitions() {
 
   const { data, isFetching } = useLatestWorkflowDefs(pagination, serverFilter);
 
-  const handleFilterChange = (obj) => {
-    setPage(1);
-    if (obj) {
-      setFilterParam(JSON.stringify(obj));
-    } else {
-      setFilterParam("");
-    }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleFilterChange = useCallback(
+    _.debounce((obj) => {
+      setPage(1);
+      if (obj) {
+        setFilterParam(JSON.stringify(obj));
+      } else {
+        setFilterParam("");
+      }
+    }, 300),
+    []
+  );
 
   const workflows = useMemo(() => {
     if (data) {
