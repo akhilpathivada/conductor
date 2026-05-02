@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import com.netflix.conductor.common.metadata.workflow.WorkflowDefSummary;
 import com.netflix.conductor.service.MetadataService;
 
 import static org.junit.Assert.assertEquals;
@@ -167,5 +168,28 @@ public class MetadataResourceTest {
         when(mockMetadataService.getWorkflowNames()).thenReturn(names);
         assertEquals(names, metadataResource.getWorkflowNames());
         verify(mockMetadataService, times(1)).getWorkflowNames();
+    }
+
+    @Test
+    public void testGetWorkflowVersions() {
+        WorkflowDefSummary v1 = new WorkflowDefSummary();
+        v1.setName("my_workflow");
+        v1.setVersion(1);
+        v1.setCreateTime(1000L);
+
+        WorkflowDefSummary v2 = new WorkflowDefSummary();
+        v2.setName("my_workflow");
+        v2.setVersion(2);
+        v2.setCreateTime(2000L);
+
+        List<WorkflowDefSummary> versions = Arrays.asList(v1, v2);
+        when(mockMetadataService.getWorkflowVersions("my_workflow")).thenReturn(versions);
+
+        List<WorkflowDefSummary> result = metadataResource.getWorkflowVersions("my_workflow");
+        assertEquals(versions, result);
+        assertEquals(2, result.size());
+        assertEquals(1, result.get(0).getVersion());
+        assertEquals(2, result.get(1).getVersion());
+        verify(mockMetadataService, times(1)).getWorkflowVersions("my_workflow");
     }
 }

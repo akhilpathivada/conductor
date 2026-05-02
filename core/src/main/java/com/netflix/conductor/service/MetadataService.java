@@ -161,4 +161,13 @@ public interface MetadataService {
      * @return Returns distinct workflow definition names (no versions, no definition bodies)
      */
     List<String> getWorkflowNames();
+
+    /**
+     * Returns lightweight version summaries for a single workflow.
+     *
+     * @param name workflow name
+     * @return list of version summaries sorted by version ascending
+     */
+    List<WorkflowDefSummary> getWorkflowVersions(
+            @NotEmpty(message = "Workflow name cannot be null or empty") String name);
 }
